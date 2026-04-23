@@ -41,3 +41,6 @@ app-example
 # generated native folders
 /ios
 /android
+
+# IDE (JetBrains / Android Studio) — per-machine state
+.idea/

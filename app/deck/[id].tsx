@@ -10,7 +10,7 @@
  *  - No drag-to-reorder.
  */
 import { eq } from "drizzle-orm";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Alert,
@@ -29,10 +29,12 @@ import { searchCards, type CardHit } from "@/db/card_search";
 import { db, schema } from "@/db/client";
 import {
   getCurrentVersion,
+  isExtraDeckType,
   loadDeckCards,
   saveAsNewVersion,
   type DeckCardRow,
 } from "@/db/deck_ops";
+import { consumePendingScan } from "@/db/scan_bridge";
 
 type Section = "main" | "extra" | "side";
 
@@ -66,6 +68,55 @@ export default function DeckEditorScreen() {
   useEffect(() => {
     load().catch((e) => Alert.alert("Failed to load deck", String(e?.message ?? e)));
   }, [load]);
+
+  // When we return from the scanner, pick up whatever it dropped in the
+  // bridge and add it to the target section. Runs on focus so it fires both
+  // on first mount (no-op) and on scanner back-pop.
+  useFocusEffect(
+    useCallback(() => {
+      const pending = consumePendingScan();
+      if (!pending) return;
+      (async () => {
+        const card = await db
+          .select({
+            id: schema.cards.id,
+            name: schema.cards.name,
+            type: schema.cards.type,
+            archetype: schema.cards.archetype,
+            imageUrlSmall: schema.cards.imageUrlSmall,
+            imageUrlCropped: schema.cards.imageUrlCropped,
+          })
+          .from(schema.cards)
+          .where(eq(schema.cards.id, pending.cardId))
+          .limit(1)
+          .get();
+        if (!card) return;
+        // Reject mismatches: a scanned Fusion going into Main would be
+        // silently wrong. The scanner doesn't enforce this.
+        const targetIsExtra = pending.section === "extra";
+        const cardIsExtra = isExtraDeckType(card.type);
+        if (targetIsExtra !== cardIsExtra && pending.section !== "side") {
+          Alert.alert(
+            "Wrong section",
+            `${card.name} is ${cardIsExtra ? "an Extra-deck" : "a Main-deck"} card — can't add it to ${pending.section}.`,
+          );
+          return;
+        }
+        addCard(
+          {
+            id: card.id,
+            name: card.name,
+            type: card.type,
+            archetype: card.archetype,
+            imageUrlSmall: card.imageUrlSmall,
+            imageUrlCropped: card.imageUrlCropped,
+            isExtra: cardIsExtra,
+          },
+          pending.section,
+        );
+      })().catch((e) => Alert.alert("Scan add failed", String(e?.message ?? e)));
+    }, []),
+  );
 
   const counts = useMemo(() => {
     const out = { main: 0, extra: 0, side: 0 };
@@ -272,6 +323,7 @@ function CardSearchModal({
   onClose: () => void;
   onPick: (hit: CardHit) => void;
 }) {
+  const router = useRouter();
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<CardHit[]>([]);
   const [loading, setLoading] = useState(false);
@@ -319,15 +371,29 @@ function CardSearchModal({
             <Text style={styles.modalClose}>Done</Text>
           </Pressable>
         </View>
-        <TextInput
-          style={styles.modalInput}
-          placeholder={section === "side" ? "Search any card..." : "Search cards..."}
-          value={q}
-          onChangeText={setQ}
-          autoFocus
-          autoCorrect={false}
-          autoCapitalize="none"
-        />
+        <View style={styles.modalSearchRow}>
+          <TextInput
+            style={[styles.modalInput, { flex: 1, margin: 0 }]}
+            placeholder={section === "side" ? "Search any card..." : "Search cards..."}
+            value={q}
+            onChangeText={setQ}
+            autoFocus
+            autoCorrect={false}
+            autoCapitalize="none"
+          />
+          <Pressable
+            style={styles.scanBtn}
+            onPress={() => {
+              if (!section) return;
+              // Close the modal first so the back-pop from scanner lands on
+              // the deck editor, not on a stale modal.
+              onClose();
+              router.push({ pathname: "/scan", params: { section } });
+            }}
+          >
+            <Text style={styles.scanBtnText}>📷</Text>
+          </Pressable>
+        </View>
         <FlatList
           data={hits}
           keyExtractor={(h) => String(h.id)}
@@ -440,6 +506,22 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     fontSize: 16,
   },
+  modalSearchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    gap: 8,
+  },
+  scanBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    backgroundColor: "#3a6bd9",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scanBtnText: { fontSize: 22 },
   hitRow: {
     flexDirection: "row",
     alignItems: "center",

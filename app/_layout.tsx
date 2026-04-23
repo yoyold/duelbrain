@@ -40,6 +40,7 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="deck/[id]" options={{ headerBackTitle: "Decks" }} />
         <Stack.Screen name="match/[id]" options={{ headerBackTitle: "History" }} />
+        <Stack.Screen name="scan" options={{ headerBackTitle: "Back" }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

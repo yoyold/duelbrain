@@ -41,7 +41,14 @@
           }
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "DuelBrain uses the camera to scan Yu-Gi-Oh! cards and match them against the catalog.",
+          "photosPermission": "DuelBrain reads photos so you can pick a card image from your library instead of re-shooting."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
