@@ -22,6 +22,7 @@ import {
   View,
 } from "react-native";
 
+import { palette } from "@/constants/theme";
 import { db, schema } from "@/db/client";
 import {
   LOSS_REASONS,
@@ -159,6 +160,7 @@ export default function MatchLoggerScreen() {
           <TextInput
             style={styles.input}
             placeholder="Snake-Eye, Tenpai..."
+            placeholderTextColor={palette.textDim}
             value={opponent}
             onChangeText={setOpponent}
             autoCapitalize="words"
@@ -207,13 +209,13 @@ export default function MatchLoggerScreen() {
           <View style={styles.buttonRow}>
             <BigBtn
               active={wentFirst === true}
-              color="#3a6bd9"
+              color={palette.cyan}
               onPress={() => setWentFirst(true)}
               label="Went 1st"
             />
             <BigBtn
               active={wentFirst === false}
-              color="#9657b5"
+              color={palette.purple}
               onPress={() => setWentFirst(false)}
               label="Went 2nd"
             />
@@ -226,19 +228,19 @@ export default function MatchLoggerScreen() {
           <View style={styles.buttonRow}>
             <BigBtn
               active={result === "win"}
-              color="#2a8a4d"
+              color={palette.win}
               onPress={() => setResult("win")}
               label="Win"
             />
             <BigBtn
               active={result === "loss"}
-              color="#b73a3a"
+              color={palette.loss}
               onPress={() => setResult("loss")}
               label="Loss"
             />
             <BigBtn
               active={result === "draw"}
-              color="#888"
+              color={palette.draw}
               onPress={() => setResult("draw")}
               label="Draw"
             />
@@ -282,6 +284,7 @@ export default function MatchLoggerScreen() {
           <TextInput
             style={styles.input}
             placeholder="Locals, online, regional..."
+            placeholderTextColor={palette.textDim}
             value={event}
             onChangeText={setEvent}
           />
@@ -291,6 +294,7 @@ export default function MatchLoggerScreen() {
           <TextInput
             style={[styles.input, { minHeight: 60 }]}
             placeholder="What happened?"
+            placeholderTextColor={palette.textDim}
             value={notes}
             onChangeText={setNotes}
             multiline
@@ -332,7 +336,12 @@ function BigBtn({
         active && { backgroundColor: color },
       ]}
     >
-      <Text style={[styles.bigBtnText, active && { color: "#fff" }]}>
+      <Text
+        style={[
+          styles.bigBtnText,
+          active && { color: palette.textOnAccent },
+        ]}
+      >
         {label}
       </Text>
     </Pressable>
@@ -340,20 +349,22 @@ function BigBtn({
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, padding: 16 },
+  root: { flex: 1, padding: 16, backgroundColor: palette.bg },
   section: { marginBottom: 18 },
   label: {
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "700",
     textTransform: "uppercase",
-    letterSpacing: 0.4,
-    color: "#888",
+    letterSpacing: 0.6,
+    color: palette.textMuted,
     marginBottom: 6,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
+    borderColor: palette.border,
+    backgroundColor: palette.surface,
+    color: palette.text,
+    borderRadius: 10,
     padding: 12,
     fontSize: 16,
   },
@@ -362,12 +373,19 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 12,
+    borderColor: palette.border,
+    backgroundColor: palette.surface,
+    borderRadius: 10,
+    padding: 14,
   },
-  rowBtnText: { fontSize: 16, fontWeight: "500" },
-  rowBtnHint: { fontSize: 12, color: "#888" },
+  rowBtnText: { fontSize: 16, fontWeight: "600", color: palette.text },
+  rowBtnHint: {
+    fontSize: 11,
+    color: palette.gold,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    fontWeight: "700",
+  },
   buttonRow: { flexDirection: "row", gap: 8 },
   bigBtn: {
     flex: 1,
@@ -375,41 +393,60 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 2,
     alignItems: "center",
+    backgroundColor: palette.surface,
   },
-  bigBtnText: { fontSize: 16, fontWeight: "600", color: "#333" },
+  bigBtnText: { fontSize: 16, fontWeight: "700", color: palette.text },
   pill: {
-    backgroundColor: "#eef3fb",
+    backgroundColor: palette.surfaceElevated,
+    borderWidth: 1,
+    borderColor: palette.border,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 16,
     marginRight: 6,
   },
-  pillText: { fontSize: 14, color: "#3a6bd9", fontWeight: "500" },
+  pillText: { fontSize: 14, color: palette.gold, fontWeight: "600" },
   techHint: {
-    marginTop: 8,
+    marginTop: 10,
     paddingVertical: 6,
     alignSelf: "flex-start",
   },
-  techHintText: { fontSize: 13, color: "#3a6bd9", fontWeight: "600" },
+  techHintText: { fontSize: 13, color: palette.gold, fontWeight: "600" },
   reasonsWrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   reasonPill: {
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: palette.border,
+    backgroundColor: palette.surface,
   },
-  reasonPillActive: { backgroundColor: "#b73a3a", borderColor: "#b73a3a" },
-  reasonPillText: { fontSize: 14, color: "#666" },
-  reasonPillTextActive: { color: "#fff", fontWeight: "600" },
-  hint: { marginTop: 8, fontSize: 12, color: "#888", fontStyle: "italic" },
+  reasonPillActive: { backgroundColor: palette.loss, borderColor: palette.loss },
+  reasonPillText: { fontSize: 14, color: palette.textMuted },
+  reasonPillTextActive: { color: palette.textOnAccent, fontWeight: "700" },
+  hint: { marginTop: 8, fontSize: 12, color: palette.textMuted, fontStyle: "italic" },
   save: {
-    backgroundColor: "#3a6bd9",
+    backgroundColor: palette.gold,
     padding: 16,
     borderRadius: 10,
     alignItems: "center",
     marginTop: 8,
+    shadowColor: palette.gold,
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 4,
   },
-  saveDisabled: { backgroundColor: "#aaa" },
-  saveText: { color: "#fff", fontWeight: "700", fontSize: 16 },
+  saveDisabled: {
+    backgroundColor: palette.goldDim,
+    opacity: 0.5,
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  saveText: {
+    color: palette.textOnAccent,
+    fontWeight: "800",
+    fontSize: 16,
+    letterSpacing: 0.5,
+  },
 });

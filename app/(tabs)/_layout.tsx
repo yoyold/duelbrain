@@ -3,18 +3,33 @@ import React from "react";
 
 import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { palette } from "@/constants/theme";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: true,
         tabBarButton: HapticTab,
+        tabBarActiveTintColor: palette.gold,
+        tabBarInactiveTintColor: palette.textDim,
+        tabBarStyle: {
+          backgroundColor: palette.surface,
+          borderTopColor: palette.border,
+          borderTopWidth: 1,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: "600",
+          letterSpacing: 0.3,
+        },
+        headerStyle: { backgroundColor: palette.surface },
+        headerTintColor: palette.gold,
+        headerTitleStyle: {
+          color: palette.text,
+          fontWeight: "700",
+        },
+        sceneStyle: { backgroundColor: palette.bg },
       }}
     >
       <Tabs.Screen
@@ -23,7 +38,7 @@ export default function TabLayout() {
           title: "Log",
           headerTitle: "Log a match",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="plus.circle.fill" color={color} />
+            <IconSymbol size={26} name="plus.circle.fill" color={color} />
           ),
         }}
       />
@@ -32,7 +47,7 @@ export default function TabLayout() {
         options={{
           title: "History",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="clock.fill" color={color} />
+            <IconSymbol size={26} name="clock.fill" color={color} />
           ),
         }}
       />
@@ -41,7 +56,7 @@ export default function TabLayout() {
         options={{
           title: "Decks",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="rectangle.stack.fill" color={color} />
+            <IconSymbol size={26} name="rectangle.stack.fill" color={color} />
           ),
         }}
       />
@@ -50,7 +65,7 @@ export default function TabLayout() {
         options={{
           title: "Tech",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="lightbulb.fill" color={color} />
+            <IconSymbol size={26} name="lightbulb.fill" color={color} />
           ),
         }}
       />
@@ -59,7 +74,7 @@ export default function TabLayout() {
         options={{
           title: "Stats",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="chart.bar.fill" color={color} />
+            <IconSymbol size={26} name="chart.bar.fill" color={color} />
           ),
         }}
       />

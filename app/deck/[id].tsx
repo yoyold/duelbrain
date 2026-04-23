@@ -25,6 +25,7 @@ import {
   View,
 } from "react-native";
 
+import { palette } from "@/constants/theme";
 import { searchCards, type CardHit } from "@/db/card_search";
 import { db, schema } from "@/db/client";
 import {
@@ -212,13 +213,20 @@ export default function DeckEditorScreen() {
           headerBackTitle: "Decks",
           headerLeft: () => (
             <Pressable onPress={onBack} style={{ paddingHorizontal: 8 }}>
-              <Text style={{ color: "#3a6bd9", fontSize: 16 }}>Back</Text>
+              <Text style={{ color: palette.gold, fontSize: 16, fontWeight: "600" }}>Back</Text>
             </Pressable>
           ),
           headerRight: () =>
             dirty ? (
               <Pressable onPress={onSave} disabled={saving} style={{ paddingHorizontal: 8 }}>
-                <Text style={{ color: saving ? "#999" : "#2a8a4d", fontSize: 16, fontWeight: "700" }}>
+                <Text
+                  style={{
+                    color: saving ? palette.textDim : palette.gold,
+                    fontSize: 16,
+                    fontWeight: "800",
+                    letterSpacing: 0.3,
+                  }}
+                >
                   {saving ? "Saving..." : "Save"}
                 </Text>
               </Pressable>
@@ -375,6 +383,7 @@ function CardSearchModal({
           <TextInput
             style={[styles.modalInput, { flex: 1, margin: 0 }]}
             placeholder={section === "side" ? "Search any card..." : "Search cards..."}
+            placeholderTextColor={palette.textDim}
             value={q}
             onChangeText={setQ}
             autoFocus
@@ -433,76 +442,106 @@ function CardSearchModal({
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#fafafa" },
+  root: { flex: 1, backgroundColor: palette.bg },
   subhead: {
     paddingHorizontal: 16,
-    paddingTop: 8,
-    fontSize: 12,
-    color: "#888",
+    paddingTop: 10,
+    fontSize: 11,
+    color: palette.gold,
     textTransform: "uppercase",
-    letterSpacing: 0.4,
+    letterSpacing: 0.6,
+    fontWeight: "700",
   },
   sectionHeader: {
     flexDirection: "row",
     alignItems: "baseline",
     justifyContent: "space-between",
-    marginTop: 16,
-    marginBottom: 8,
+    marginTop: 20,
+    marginBottom: 10,
     paddingHorizontal: 4,
+    paddingBottom: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.border,
   },
-  sectionTitle: { fontSize: 18, fontWeight: "700" },
-  sectionCount: { fontSize: 16, fontWeight: "600" },
-  sectionLimit: { fontSize: 12, color: "#888", fontWeight: "400" },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: palette.gold,
+    letterSpacing: 0.5,
+  },
+  sectionCount: { fontSize: 16, fontWeight: "700", color: palette.text },
+  sectionLimit: { fontSize: 12, color: palette.textDim, fontWeight: "500" },
   cardRow: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 10,
-    backgroundColor: "#fff",
+    padding: 12,
+    backgroundColor: palette.surface,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#eee",
+    borderColor: palette.border,
     marginBottom: 6,
   },
-  cardName: { fontSize: 15, fontWeight: "500" },
-  cardType: { fontSize: 11, color: "#888", marginTop: 2 },
+  cardName: { fontSize: 15, fontWeight: "600", color: palette.text },
+  cardType: { fontSize: 11, color: palette.textMuted, marginTop: 2 },
   copiesGroup: { flexDirection: "row", alignItems: "center", gap: 8 },
   copiesBtn: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#eef3fb",
+    backgroundColor: palette.surfaceElevated,
+    borderWidth: 1,
+    borderColor: palette.border,
     alignItems: "center",
     justifyContent: "center",
   },
   copiesBtnDisabled: { opacity: 0.4 },
-  copiesBtnText: { fontSize: 18, fontWeight: "700", color: "#3a6bd9" },
-  copiesText: { fontSize: 16, fontWeight: "700", minWidth: 18, textAlign: "center" },
+  copiesBtnText: { fontSize: 18, fontWeight: "700", color: palette.gold },
+  copiesText: {
+    fontSize: 16,
+    fontWeight: "800",
+    minWidth: 18,
+    textAlign: "center",
+    color: palette.text,
+  },
   addBtn: {
     padding: 12,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#ccd",
+    borderColor: palette.border,
     borderStyle: "dashed",
     borderRadius: 8,
     marginBottom: 4,
     marginTop: 4,
+    backgroundColor: palette.surface,
   },
-  addBtnText: { color: "#3a6bd9", fontWeight: "600" },
+  addBtnText: {
+    color: palette.gold,
+    fontWeight: "700",
+    letterSpacing: 0.3,
+  },
   modalHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: palette.border,
+    backgroundColor: palette.surface,
   },
-  modalTitle: { fontSize: 17, fontWeight: "700" },
-  modalClose: { fontSize: 16, color: "#3a6bd9", fontWeight: "600" },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: "800",
+    color: palette.gold,
+    letterSpacing: 0.3,
+  },
+  modalClose: { fontSize: 16, color: palette.gold, fontWeight: "700" },
   modalInput: {
     margin: 12,
     padding: 12,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: palette.border,
+    backgroundColor: palette.surface,
+    color: palette.text,
     borderRadius: 8,
     fontSize: 16,
   },
@@ -512,12 +551,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 12,
     gap: 8,
+    backgroundColor: palette.bg,
   },
   scanBtn: {
     width: 48,
     height: 48,
     borderRadius: 8,
-    backgroundColor: "#3a6bd9",
+    backgroundColor: palette.gold,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -526,12 +566,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#f3f3f3",
+    borderBottomColor: palette.border,
+    backgroundColor: palette.bg,
   },
-  hitName: { fontSize: 15, fontWeight: "500" },
-  hitMeta: { fontSize: 12, color: "#888", marginTop: 2 },
-  hitAdd: { fontSize: 22, color: "#3a6bd9", fontWeight: "700", paddingLeft: 12 },
-  modalEmpty: { padding: 24, textAlign: "center", color: "#888" },
+  hitName: { fontSize: 15, fontWeight: "600", color: palette.text },
+  hitMeta: { fontSize: 12, color: palette.textMuted, marginTop: 2 },
+  hitAdd: {
+    fontSize: 22,
+    color: palette.gold,
+    fontWeight: "800",
+    paddingLeft: 12,
+  },
+  modalEmpty: { padding: 24, textAlign: "center", color: palette.textMuted },
 });

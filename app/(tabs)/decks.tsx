@@ -21,6 +21,7 @@ import {
   View,
 } from "react-native";
 
+import { palette } from "@/constants/theme";
 import { db, schema } from "@/db/client";
 import { createDeck } from "@/db/deck_ops";
 import { getCardCount, syncCardCatalog, type SyncProgress } from "@/db/sync_cards";
@@ -192,6 +193,7 @@ export default function DecksScreen() {
             <TextInput
               style={styles.modalInput}
               placeholder="Deck name (e.g. Snake-Eye)"
+              placeholderTextColor={palette.textDim}
               value={newDeckName}
               onChangeText={setNewDeckName}
               autoFocus
@@ -248,26 +250,36 @@ function formatProgress(p: SyncProgress): string {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1 },
+  root: { flex: 1, backgroundColor: palette.bg },
   banner: {
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
-    backgroundColor: "#f5f7fb",
+    backgroundColor: palette.surface,
     borderBottomWidth: 1,
-    borderBottomColor: "#e5e9f0",
+    borderBottomColor: palette.border,
   },
-  bannerTitle: { fontSize: 11, fontWeight: "700", color: "#666", textTransform: "uppercase", letterSpacing: 0.4 },
-  bannerSub: { fontSize: 15, fontWeight: "500", marginTop: 2 },
-  progressText: { fontSize: 12, color: "#3a6bd9", marginTop: 4 },
+  bannerTitle: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: palette.gold,
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+  },
+  bannerSub: { fontSize: 15, fontWeight: "600", marginTop: 4, color: palette.text },
+  progressText: { fontSize: 12, color: palette.cyan, marginTop: 4 },
   syncBtn: {
-    backgroundColor: "#3a6bd9",
+    backgroundColor: palette.gold,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 8,
   },
-  syncBtnBusy: { backgroundColor: "#aaa" },
-  syncBtnText: { color: "#fff", fontWeight: "600" },
+  syncBtnBusy: { backgroundColor: palette.goldDim, opacity: 0.6 },
+  syncBtnText: {
+    color: palette.textOnAccent,
+    fontWeight: "800",
+    letterSpacing: 0.3,
+  },
   toolbar: {
     flexDirection: "row",
     justifyContent: "flex-end",
@@ -275,28 +287,32 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
   newBtn: {
-    backgroundColor: "#2a8a4d",
+    backgroundColor: palette.purple,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 8,
   },
-  newBtnText: { color: "#fff", fontWeight: "600" },
+  newBtnText: {
+    color: palette.textOnAccent,
+    fontWeight: "800",
+    letterSpacing: 0.3,
+  },
   deck: {
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
+    borderColor: palette.border,
+    borderRadius: 10,
     padding: 14,
-    backgroundColor: "#fff",
+    backgroundColor: palette.surface,
   },
-  deckName: { fontSize: 16, fontWeight: "600" },
-  deckMeta: { fontSize: 12, color: "#888", marginTop: 4 },
-  chevron: { fontSize: 22, color: "#bbb", paddingLeft: 8 },
-  empty: { padding: 24, textAlign: "center", color: "#888" },
+  deckName: { fontSize: 16, fontWeight: "700", color: palette.text },
+  deckMeta: { fontSize: 12, color: palette.textMuted, marginTop: 4 },
+  chevron: { fontSize: 22, color: palette.gold, paddingLeft: 8, fontWeight: "700" },
+  empty: { padding: 24, textAlign: "center", color: palette.textMuted },
   modalBackdrop: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.35)",
+    backgroundColor: palette.scrim,
     alignItems: "center",
     justifyContent: "center",
     padding: 24,
@@ -304,14 +320,24 @@ const styles = StyleSheet.create({
   modalCard: {
     width: "100%",
     maxWidth: 420,
-    backgroundColor: "#fff",
-    borderRadius: 12,
+    backgroundColor: palette.surfaceElevated,
+    borderWidth: 1,
+    borderColor: palette.border,
+    borderRadius: 14,
     padding: 20,
   },
-  modalTitle: { fontSize: 17, fontWeight: "700", marginBottom: 12 },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: "800",
+    marginBottom: 12,
+    color: palette.gold,
+    letterSpacing: 0.3,
+  },
   modalInput: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: palette.border,
+    backgroundColor: palette.surface,
+    color: palette.text,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
@@ -323,13 +349,13 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   modalBtn: {
-    backgroundColor: "#2a8a4d",
+    backgroundColor: palette.gold,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 8,
   },
-  modalBtnDisabled: { backgroundColor: "#aaa" },
-  modalBtnText: { color: "#fff", fontWeight: "600" },
+  modalBtnDisabled: { backgroundColor: palette.goldDim, opacity: 0.5 },
+  modalBtnText: { color: palette.textOnAccent, fontWeight: "800" },
   modalBtnGhost: { paddingHorizontal: 16, paddingVertical: 10 },
-  modalBtnGhostText: { color: "#666", fontWeight: "600" },
+  modalBtnGhostText: { color: palette.textMuted, fontWeight: "600" },
 });

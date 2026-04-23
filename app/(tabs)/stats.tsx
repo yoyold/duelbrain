@@ -2,11 +2,12 @@
  * Stats dashboard. v1: plain numbers per archetype, split on went_first.
  * Charts land in v2 once match volume is meaningful.
  */
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 
+import { palette } from "@/constants/theme";
 import { db, schema } from "@/db/client";
 
 type Row = {
@@ -102,26 +103,51 @@ function Metric({ label, value, sub }: { label: string; value: string; sub: stri
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1 },
+  root: { flex: 1, backgroundColor: palette.bg },
   hero: {
-    padding: 24,
+    padding: 28,
     alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: palette.border,
+    backgroundColor: palette.surface,
   },
-  heroLabel: { fontSize: 12, color: "#888", textTransform: "uppercase", letterSpacing: 0.4 },
-  heroNumber: { fontSize: 40, fontWeight: "800" },
+  heroLabel: {
+    fontSize: 12,
+    color: palette.gold,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+    fontWeight: "700",
+  },
+  heroNumber: {
+    fontSize: 44,
+    fontWeight: "800",
+    color: palette.gold,
+    marginTop: 6,
+    letterSpacing: 1,
+  },
   row: {
     padding: 14,
-    backgroundColor: "#fff",
-    borderRadius: 8,
+    backgroundColor: palette.surface,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#eee",
+    borderColor: palette.border,
   },
-  opponent: { fontSize: 15, fontWeight: "600", marginBottom: 10 },
+  opponent: {
+    fontSize: 15,
+    fontWeight: "700",
+    marginBottom: 12,
+    color: palette.text,
+  },
   metrics: { flexDirection: "row", justifyContent: "space-around" },
-  metricValue: { fontSize: 18, fontWeight: "700" },
-  metricSub: { fontSize: 11, color: "#888" },
-  metricLabel: { fontSize: 10, color: "#aaa", textTransform: "uppercase", letterSpacing: 0.4 },
-  empty: { padding: 24, textAlign: "center", color: "#888" },
+  metricValue: { fontSize: 20, fontWeight: "800", color: palette.text },
+  metricSub: { fontSize: 11, color: palette.textMuted, marginTop: 2 },
+  metricLabel: {
+    fontSize: 10,
+    color: palette.textDim,
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+    fontWeight: "700",
+    marginTop: 2,
+  },
+  empty: { padding: 24, textAlign: "center", color: palette.textMuted },
 });

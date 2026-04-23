@@ -15,6 +15,7 @@ import {
   View,
 } from "react-native";
 
+import { palette, resultColor } from "@/constants/theme";
 import { listRecentMatches, type MatchListRow } from "@/db/match_ops";
 
 export default function HistoryScreen() {
@@ -76,8 +77,7 @@ export default function HistoryScreen() {
 }
 
 function ResultBadge({ result }: { result: "win" | "loss" | "draw" }) {
-  const color =
-    result === "win" ? "#2a8a4d" : result === "loss" ? "#b73a3a" : "#888";
+  const color = resultColor(result);
   const letter = result === "win" ? "W" : result === "loss" ? "L" : "D";
   return (
     <View style={[styles.badge, { backgroundColor: color }]}>
@@ -107,32 +107,33 @@ function formatDate(unixSeconds: number): string {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1 },
+  root: { flex: 1, backgroundColor: palette.bg },
   row: {
     flexDirection: "row",
     alignItems: "center",
     padding: 14,
-    backgroundColor: "#fff",
-    borderRadius: 8,
+    backgroundColor: palette.surface,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#e5e9f0",
+    borderColor: palette.border,
   },
   left: { flex: 1, paddingRight: 12 },
   date: {
     fontSize: 11,
-    color: "#888",
+    color: palette.textDim,
     textTransform: "uppercase",
-    letterSpacing: 0.4,
+    letterSpacing: 0.5,
+    fontWeight: "700",
   },
-  main: { fontSize: 15, fontWeight: "600", marginTop: 2 },
-  meta: { fontSize: 12, color: "#888", marginTop: 4 },
+  main: { fontSize: 15, fontWeight: "700", marginTop: 4, color: palette.text },
+  meta: { fontSize: 12, color: palette.textMuted, marginTop: 4 },
   badge: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: "center",
     justifyContent: "center",
   },
-  badgeText: { color: "#fff", fontWeight: "800", fontSize: 15 },
-  empty: { padding: 32, textAlign: "center", color: "#888" },
+  badgeText: { color: palette.textOnAccent, fontWeight: "800", fontSize: 16 },
+  empty: { padding: 32, textAlign: "center", color: palette.textMuted },
 });

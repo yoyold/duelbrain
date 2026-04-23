@@ -25,6 +25,7 @@ import {
   View,
 } from "react-native";
 
+import { palette } from "@/constants/theme";
 import {
   listArchetypesWithTech,
   listTechForArchetype,
@@ -131,12 +132,12 @@ export default function TechScreen() {
 function TechRow({ pick }: { pick: TechPick }) {
   const priorityColor =
     pick.priority === 1
-      ? "#2a8a4d"
+      ? palette.win
       : pick.priority === 2
-        ? "#3a6bd9"
+        ? palette.gold
         : pick.priority <= 3
-          ? "#b77a1a"
-          : "#888";
+          ? palette.warn
+          : palette.draw;
 
   return (
     <View style={styles.row}>
@@ -144,7 +145,7 @@ function TechRow({ pick }: { pick: TechPick }) {
         <Image source={{ uri: pick.imageUrlSmall }} style={styles.thumb} />
       ) : (
         <View style={[styles.thumb, styles.thumbFallback]}>
-          <Text style={{ color: "#888", fontSize: 10 }}>no img</Text>
+          <Text style={{ color: palette.textDim, fontSize: 10 }}>no img</Text>
         </View>
       )}
       <View style={styles.rowBody}>
@@ -218,6 +219,7 @@ function ArchetypePickerModal({
         <TextInput
           style={styles.modalInput}
           placeholder="Filter..."
+          placeholderTextColor={palette.textDim}
           value={q}
           onChangeText={setQ}
           autoFocus
@@ -256,38 +258,49 @@ function ArchetypePickerModal({
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#fafafa" },
+  root: { flex: 1, backgroundColor: palette.bg },
   picker: {
     flexDirection: "row",
     alignItems: "center",
     padding: 14,
     borderBottomWidth: 1,
-    borderBottomColor: "#e5e9f0",
-    backgroundColor: "#f5f7fb",
+    borderBottomColor: palette.border,
+    backgroundColor: palette.surface,
   },
   pickerLabel: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#666",
+    color: palette.gold,
     textTransform: "uppercase",
-    letterSpacing: 0.4,
+    letterSpacing: 0.6,
   },
-  pickerValue: { fontSize: 16, fontWeight: "600", marginTop: 2 },
-  pickerHint: { fontSize: 12, color: "#3a6bd9", fontWeight: "600" },
+  pickerValue: {
+    fontSize: 16,
+    fontWeight: "700",
+    marginTop: 4,
+    color: palette.text,
+  },
+  pickerHint: {
+    fontSize: 11,
+    color: palette.gold,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
   row: {
     flexDirection: "row",
-    backgroundColor: "#fff",
-    padding: 10,
+    backgroundColor: palette.surface,
+    padding: 12,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#e5e9f0",
+    borderColor: palette.border,
   },
   thumb: {
-    width: 48,
-    height: 48,
+    width: 52,
+    height: 52,
     borderRadius: 6,
-    marginRight: 10,
-    backgroundColor: "#f0f0f0",
+    marginRight: 12,
+    backgroundColor: palette.surfaceElevated,
   },
   thumbFallback: { alignItems: "center", justifyContent: "center" },
   rowBody: { flex: 1 },
@@ -296,33 +309,57 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  rowName: { fontSize: 15, fontWeight: "600", flex: 1, paddingRight: 8 },
+  rowName: {
+    fontSize: 15,
+    fontWeight: "700",
+    flex: 1,
+    paddingRight: 8,
+    color: palette.text,
+  },
   priorityPill: {
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 3,
     borderRadius: 10,
   },
-  priorityText: { color: "#fff", fontSize: 11, fontWeight: "700" },
-  rowMeta: { fontSize: 12, color: "#888", marginTop: 2 },
-  rowReason: { fontSize: 13, color: "#333", marginTop: 6, lineHeight: 18 },
+  priorityText: { color: palette.textOnAccent, fontSize: 11, fontWeight: "800" },
+  rowMeta: { fontSize: 12, color: palette.textMuted, marginTop: 2 },
+  rowReason: {
+    fontSize: 13,
+    color: palette.text,
+    marginTop: 6,
+    lineHeight: 18,
+  },
   emptyBlock: { padding: 24 },
-  emptyTitle: { fontSize: 15, fontWeight: "600", marginBottom: 6 },
-  emptyBody: { fontSize: 13, color: "#666", lineHeight: 19 },
+  emptyTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    marginBottom: 6,
+    color: palette.text,
+  },
+  emptyBody: { fontSize: 13, color: palette.textMuted, lineHeight: 19 },
   modalHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: palette.border,
+    backgroundColor: palette.surface,
   },
-  modalTitle: { fontSize: 17, fontWeight: "700" },
-  modalClose: { fontSize: 16, color: "#3a6bd9", fontWeight: "600" },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: "800",
+    color: palette.gold,
+    letterSpacing: 0.3,
+  },
+  modalClose: { fontSize: 16, color: palette.gold, fontWeight: "700" },
   modalInput: {
     margin: 12,
     padding: 12,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: palette.border,
+    backgroundColor: palette.surface,
+    color: palette.text,
     borderRadius: 8,
     fontSize: 16,
   },
@@ -333,10 +370,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#f3f3f3",
+    borderBottomColor: palette.border,
+    backgroundColor: palette.bg,
   },
-  modalRowActive: { backgroundColor: "#eef3fb" },
-  modalRowName: { fontSize: 15, fontWeight: "500" },
-  modalRowCount: { fontSize: 12, color: "#888" },
-  modalEmpty: { padding: 24, textAlign: "center", color: "#888" },
+  modalRowActive: { backgroundColor: palette.surfaceActive },
+  modalRowName: { fontSize: 15, fontWeight: "600", color: palette.text },
+  modalRowCount: { fontSize: 12, color: palette.textMuted },
+  modalEmpty: { padding: 24, textAlign: "center", color: palette.textMuted },
 });

@@ -28,6 +28,7 @@ import {
   View,
 } from "react-native";
 
+import { palette } from "@/constants/theme";
 import {
   addGame,
   deleteGame,
@@ -185,7 +186,7 @@ export default function MatchDetailScreen() {
   if (loading || !match) {
     return (
       <View style={styles.center}>
-        <Text style={{ color: "#888" }}>Loading...</Text>
+        <Text style={{ color: palette.textMuted }}>Loading...</Text>
       </View>
     );
   }
@@ -226,6 +227,7 @@ export default function MatchDetailScreen() {
             <TextInput
               style={styles.input}
               value={headerOpponent}
+              placeholderTextColor={palette.textDim}
               onChangeText={(t) => {
                 setHeaderOpponent(t);
                 setHeaderDirty(true);
@@ -267,6 +269,7 @@ export default function MatchDetailScreen() {
                 setHeaderDirty(true);
               }}
               placeholder="Locals, online, regional..."
+              placeholderTextColor={palette.textDim}
             />
 
             <Label>Notes</Label>
@@ -279,6 +282,7 @@ export default function MatchDetailScreen() {
               }}
               multiline
               placeholder="What happened?"
+              placeholderTextColor={palette.textDim}
             />
 
             {headerDirty && (
@@ -426,6 +430,7 @@ function GameCard({
         onChangeText={setNotes}
         multiline
         placeholder="Opening hand, key play..."
+        placeholderTextColor={palette.textDim}
       />
 
       {dirty && (
@@ -478,14 +483,14 @@ function RowTurn({
       <BigBtn
         compact={compact}
         active={value === true}
-        color="#3a6bd9"
+        color={palette.cyan}
         onPress={() => onChange(true)}
         label="Went 1st"
       />
       <BigBtn
         compact={compact}
         active={value === false}
-        color="#9657b5"
+        color={palette.purple}
         onPress={() => onChange(false)}
         label="Went 2nd"
       />
@@ -507,21 +512,21 @@ function RowResult({
       <BigBtn
         compact={compact}
         active={value === "win"}
-        color="#2a8a4d"
+        color={palette.win}
         onPress={() => onChange("win")}
         label="Win"
       />
       <BigBtn
         compact={compact}
         active={value === "loss"}
-        color="#b73a3a"
+        color={palette.loss}
         onPress={() => onChange("loss")}
         label="Loss"
       />
       <BigBtn
         compact={compact}
         active={value === "draw"}
-        color="#888"
+        color={palette.draw}
         onPress={() => onChange("draw")}
         label="Draw"
       />
@@ -552,7 +557,12 @@ function BigBtn({
         active && { backgroundColor: color },
       ]}
     >
-      <Text style={[styles.bigBtnText, active && { color: "#fff" }]}>
+      <Text
+        style={[
+          styles.bigBtnText,
+          active && { color: palette.textOnAccent },
+        ]}
+      >
         {label}
       </Text>
     </Pressable>
@@ -571,37 +581,44 @@ function formatDate(unixSeconds: number): string {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#fafafa" },
-  center: { flex: 1, alignItems: "center", justifyContent: "center" },
+  root: { flex: 1, backgroundColor: palette.bg },
+  center: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: palette.bg },
   context: {
-    fontSize: 12,
-    color: "#888",
+    fontSize: 11,
+    color: palette.gold,
     textTransform: "uppercase",
-    letterSpacing: 0.4,
-    marginBottom: 12,
+    letterSpacing: 0.6,
+    marginBottom: 16,
+    fontWeight: "700",
   },
-  section: { marginBottom: 24 },
+  section: { marginBottom: 28 },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 8,
+    fontWeight: "800",
+    marginBottom: 10,
+    color: palette.gold,
+    letterSpacing: 0.5,
+    paddingBottom: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.border,
   },
   label: {
     fontSize: 11,
-    fontWeight: "600",
+    fontWeight: "700",
     textTransform: "uppercase",
-    letterSpacing: 0.4,
-    color: "#888",
+    letterSpacing: 0.5,
+    color: palette.textMuted,
     marginTop: 12,
     marginBottom: 6,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: palette.border,
     borderRadius: 8,
-    padding: 10,
+    padding: 12,
     fontSize: 15,
-    backgroundColor: "#fff",
+    backgroundColor: palette.surface,
+    color: palette.text,
   },
   buttonRow: { flexDirection: "row", gap: 8 },
   bigBtn: {
@@ -610,36 +627,36 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 2,
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: palette.surface,
   },
   bigBtnCompact: { paddingVertical: 8 },
-  bigBtnText: { fontSize: 15, fontWeight: "600", color: "#333" },
+  bigBtnText: { fontSize: 15, fontWeight: "700", color: palette.text },
   reasonsWrap: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   reasonPill: {
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#ccc",
-    backgroundColor: "#fff",
+    borderColor: palette.border,
+    backgroundColor: palette.surface,
   },
-  reasonPillActive: { backgroundColor: "#b73a3a", borderColor: "#b73a3a" },
-  reasonPillText: { fontSize: 13, color: "#666" },
-  reasonPillTextActive: { color: "#fff", fontWeight: "600" },
-  hint: { marginTop: 6, fontSize: 12, color: "#888", fontStyle: "italic" },
+  reasonPillActive: { backgroundColor: palette.loss, borderColor: palette.loss },
+  reasonPillText: { fontSize: 13, color: palette.textMuted },
+  reasonPillTextActive: { color: palette.textOnAccent, fontWeight: "700" },
+  hint: { marginTop: 6, fontSize: 12, color: palette.textMuted, fontStyle: "italic" },
   warn: {
     marginTop: 6,
     fontSize: 12,
-    color: "#b77a1a",
+    color: palette.warn,
     fontStyle: "italic",
   },
-  empty: { color: "#888", paddingVertical: 12 },
+  empty: { color: palette.textMuted, paddingVertical: 12 },
   gameCard: {
-    backgroundColor: "#fff",
+    backgroundColor: palette.surface,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#e5e9f0",
-    padding: 12,
+    borderColor: palette.border,
+    padding: 14,
     marginBottom: 10,
   },
   gameHeaderRow: {
@@ -647,34 +664,51 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  gameTitle: { fontSize: 16, fontWeight: "700" },
-  gameDelete: { fontSize: 13, color: "#b73a3a", fontWeight: "600" },
+  gameTitle: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: palette.text,
+    letterSpacing: 0.3,
+  },
+  gameDelete: { fontSize: 13, color: palette.loss, fontWeight: "700" },
   addBtn: {
     padding: 12,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#ccd",
+    borderColor: palette.border,
     borderStyle: "dashed",
     borderRadius: 8,
     marginTop: 4,
+    backgroundColor: palette.surface,
   },
-  addBtnText: { color: "#3a6bd9", fontWeight: "600" },
+  addBtnText: { color: palette.gold, fontWeight: "700", letterSpacing: 0.3 },
   saveBtn: {
     marginTop: 12,
-    backgroundColor: "#2a8a4d",
+    backgroundColor: palette.gold,
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
+    shadowColor: palette.gold,
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 3,
   },
-  saveBtnBusy: { backgroundColor: "#aaa" },
-  saveBtnText: { color: "#fff", fontWeight: "700", fontSize: 15 },
+  saveBtnBusy: { backgroundColor: palette.goldDim, opacity: 0.6, shadowOpacity: 0, elevation: 0 },
+  saveBtnText: {
+    color: palette.textOnAccent,
+    fontWeight: "800",
+    fontSize: 15,
+    letterSpacing: 0.3,
+  },
   deleteMatch: {
     borderWidth: 1,
-    borderColor: "#b73a3a",
+    borderColor: palette.loss,
     borderRadius: 8,
     padding: 12,
     alignItems: "center",
+    backgroundColor: palette.surface,
   },
-  deleteMatchText: { color: "#b73a3a", fontWeight: "700" },
+  deleteMatchText: { color: palette.loss, fontWeight: "800", letterSpacing: 0.3 },
 });
 
