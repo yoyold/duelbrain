@@ -39,6 +39,7 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="deck/[id]" options={{ headerBackTitle: "Decks" }} />
+        <Stack.Screen name="match/[id]" options={{ headerBackTitle: "History" }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

@@ -18,6 +18,11 @@ const MAPPING = {
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
+  // DuelBrain additions
+  'plus.circle.fill': 'add-circle',
+  'clock.fill': 'history',
+  'rectangle.stack.fill': 'layers',
+  'chart.bar.fill': 'bar-chart',
 } as IconMapping;
 
 /**
