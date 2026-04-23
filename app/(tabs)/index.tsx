@@ -184,6 +184,21 @@ export default function MatchLoggerScreen() {
                 )}
               />
             )}
+          {opponent.trim().length > 0 && (
+            <Pressable
+              style={styles.techHint}
+              onPress={() =>
+                router.push({
+                  pathname: "/tech",
+                  params: { archetype: opponent.trim() },
+                })
+              }
+            >
+              <Text style={styles.techHintText}>
+                💡 View tech picks for {opponent.trim()}
+              </Text>
+            </Pressable>
+          )}
         </View>
 
         {/* Went first */}
@@ -370,6 +385,12 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   pillText: { fontSize: 14, color: "#3a6bd9", fontWeight: "500" },
+  techHint: {
+    marginTop: 8,
+    paddingVertical: 6,
+    alignSelf: "flex-start",
+  },
+  techHintText: { fontSize: 13, color: "#3a6bd9", fontWeight: "600" },
   reasonsWrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   reasonPill: {
     paddingHorizontal: 12,

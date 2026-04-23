@@ -23,6 +23,7 @@ const MAPPING = {
   'clock.fill': 'history',
   'rectangle.stack.fill': 'layers',
   'chart.bar.fill': 'bar-chart',
+  'lightbulb.fill': 'lightbulb',
 } as IconMapping;
 
 /**
