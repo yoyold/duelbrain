@@ -14,6 +14,7 @@
 import { sql } from "drizzle-orm";
 
 import { db, schema } from "./client";
+import { seedTechAnswers } from "./tech_answers_seed";
 
 const API_URL = "https://db.ygoprodeck.com/api/v7/cardinfo.php";
 
@@ -30,7 +31,13 @@ type RawCard = {
 };
 
 export type SyncProgress = {
-  phase: "fetching" | "parsing" | "inserting" | "backfilling" | "done";
+  phase:
+    | "fetching"
+    | "parsing"
+    | "inserting"
+    | "backfilling"
+    | "tech_answers"
+    | "done";
   /** 0..1, or null when indeterminate */
   ratio: number | null;
   /** total cards to insert; set once phase transitions to "inserting" */
@@ -42,6 +49,11 @@ export type SyncProgress = {
 export type SyncResult = {
   cardsUpserted: number;
   archetypesFound: number;
+  techAnswersInserted: number;
+  /** Curated card names that couldn't be resolved against the synced
+   *  catalog. Surface them so typos in tech_answers_data.ts are visible
+   *  rather than silently dropping rows. */
+  techAnswersMissing: string[];
   durationMs: number;
 };
 
@@ -116,10 +128,17 @@ export async function syncCardCatalog(
     .from(schema.archetypes)
     .get();
 
+  // Rebuild curated tech_answers now that card ids are resolvable. Cheap
+  // (~150 inserts); runs every sync so dataset edits ship with the next tap.
+  onProgress?.({ phase: "tech_answers", ratio: null });
+  const tech = await seedTechAnswers();
+
   onProgress?.({ phase: "done", ratio: 1 });
   return {
     cardsUpserted: inserted,
     archetypesFound: archCount?.n ?? 0,
+    techAnswersInserted: tech.inserted,
+    techAnswersMissing: tech.missingCardNames,
     durationMs: Date.now() - t0,
   };
 }

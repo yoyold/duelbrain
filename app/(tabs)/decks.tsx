@@ -76,9 +76,13 @@ export default function DecksScreen() {
     try {
       const result = await syncCardCatalog((p) => setProgress(p));
       await refresh();
+      const missingNote =
+        result.techAnswersMissing.length > 0
+          ? `\n\nUnresolved tech names: ${result.techAnswersMissing.slice(0, 5).join(", ")}${result.techAnswersMissing.length > 5 ? ` (+${result.techAnswersMissing.length - 5} more)` : ""}`
+          : "";
       Alert.alert(
         "Sync complete",
-        `${result.cardsUpserted.toLocaleString()} cards · ${result.archetypesFound} archetypes\n${(result.durationMs / 1000).toFixed(1)}s`,
+        `${result.cardsUpserted.toLocaleString()} cards · ${result.archetypesFound} archetypes · ${result.techAnswersInserted} tech answers\n${(result.durationMs / 1000).toFixed(1)}s${missingNote}`,
       );
     } catch (e: any) {
       Alert.alert("Sync failed", String(e?.message ?? e));
@@ -236,6 +240,8 @@ function formatProgress(p: SyncProgress): string {
       return "Inserting...";
     case "backfilling":
       return "Backfilling archetype list...";
+    case "tech_answers":
+      return "Seeding tech answers...";
     case "done":
       return "Done";
   }
