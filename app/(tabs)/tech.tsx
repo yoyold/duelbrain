@@ -19,6 +19,7 @@ import {
   Modal,
   Platform,
   Pressable,
+  SectionList,
   StyleSheet,
   Text,
   TextInput,
@@ -27,8 +28,9 @@ import {
 
 import { palette } from "@/constants/theme";
 import {
+  listArchetypesWithLossHistory,
   listArchetypesWithTech,
-  listTechForArchetype,
+  loadTechSuggestions,
   type TechPick,
 } from "@/db/tech_query";
 
@@ -37,17 +39,40 @@ export default function TechScreen() {
   const router = useRouter();
 
   const [archetype, setArchetype] = useState<string | null>(null);
-  const [picks, setPicks] = useState<TechPick[]>([]);
+  const [curated, setCurated] = useState<TechPick[]>([]);
+  const [personal, setPersonal] = useState<TechPick[]>([]);
   const [available, setAvailable] = useState<{ archetype: string; count: number }[]>([]);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   const reload = useCallback(async (a: string | null) => {
-    setAvailable(await listArchetypesWithTech());
+    // Picker options = union of archetypes with curated picks + archetypes
+    // the user has actually lost actionable games to. Merge counts so the
+    // most-relevant matchups surface first.
+    const [curatedOpts, personalOpts] = await Promise.all([
+      listArchetypesWithTech(),
+      listArchetypesWithLossHistory(),
+    ]);
+    const merged = new Map<string, number>();
+    for (const o of curatedOpts) merged.set(o.archetype, o.count);
+    for (const o of personalOpts) {
+      merged.set(o.archetype, (merged.get(o.archetype) ?? 0) + o.count);
+    }
+    setAvailable(
+      Array.from(merged.entries())
+        .map(([archetype, count]) => ({ archetype, count }))
+        .sort((x, y) =>
+          y.count !== x.count ? y.count - x.count : x.archetype.localeCompare(y.archetype),
+        ),
+    );
+
     if (a) {
-      setPicks(await listTechForArchetype(a));
+      const { curated: c, personal: p } = await loadTechSuggestions(a);
+      setCurated(c);
+      setPersonal(p);
     } else {
-      setPicks([]);
+      setCurated([]);
+      setPersonal([]);
     }
     setLoaded(true);
   }, []);
@@ -79,27 +104,54 @@ export default function TechScreen() {
       </Pressable>
 
       {archetype ? (
-        <FlatList
-          data={picks}
-          keyExtractor={(p) => String(p.id)}
-          contentContainerStyle={{ padding: 12, paddingBottom: 40 }}
-          ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
-          renderItem={({ item }) => <TechRow pick={item} />}
-          ListEmptyComponent={
-            loaded ? (
+        (() => {
+          const sections: { title: string; subtitle: string; data: TechPick[] }[] = [];
+          if (curated.length > 0) {
+            sections.push({
+              title: "Curated picks",
+              subtitle: "hand-seeded answers for this matchup",
+              data: curated,
+            });
+          }
+          if (personal.length > 0) {
+            sections.push({
+              title: "From your losses",
+              subtitle: "mined from your own loss_reason history",
+              data: personal,
+            });
+          }
+          if (sections.length === 0 && loaded) {
+            return (
               <View style={styles.emptyBlock}>
                 <Text style={styles.emptyTitle}>
                   No tech answers for "{archetype}"
                 </Text>
                 <Text style={styles.emptyBody}>
-                  Either the card catalog isn't synced yet, or this archetype
-                  isn't in the curated dataset. Try syncing the catalog on the
-                  Decks tab, or pick a different archetype.
+                  Nothing is curated for this archetype yet, and you haven't
+                  logged any losses with a fixable loss_reason against them.
+                  Try syncing the catalog on the Decks tab, or come back after
+                  logging a few losses with the game-level reason set.
                 </Text>
               </View>
-            ) : null
+            );
           }
-        />
+          return (
+            <SectionList
+              sections={sections}
+              keyExtractor={(p) => String(p.id)}
+              contentContainerStyle={{ padding: 12, paddingBottom: 40 }}
+              ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+              stickySectionHeadersEnabled={false}
+              renderSectionHeader={({ section }) => (
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>{section.title}</Text>
+                  <Text style={styles.sectionSubtitle}>{section.subtitle}</Text>
+                </View>
+              )}
+              renderItem={({ item }) => <TechRow pick={item} />}
+            />
+          );
+        })()
       ) : (
         <View style={styles.emptyBlock}>
           <Text style={styles.emptyTitle}>Pick an archetype to see tech picks.</Text>
@@ -159,12 +211,14 @@ function TechRow({ pick }: { pick: TechPick }) {
         </View>
         <Text style={styles.rowMeta} numberOfLines={1}>
           {pick.cardType}
-          {pick.coverageScore != null
-            ? ` · answers ${pick.coverageScore} matchup${
-                pick.coverageScore === 1 ? "" : "s"
-              }`
-            : ""}
-          {pick.source !== "curated" ? ` · ${pick.source}` : ""}
+          {pick.source === "personal"
+            ? pick.coverageScore != null
+              ? ` · ${pick.coverageScore} loss${pick.coverageScore === 1 ? "" : "es"} tagged`
+              : ""
+            : pick.coverageScore != null
+              ? ` · answers ${pick.coverageScore} matchup${pick.coverageScore === 1 ? "" : "s"}`
+              : ""}
+          {pick.source === "meta_mined" ? " · meta-mined" : ""}
         </Text>
         <Text style={styles.rowReason}>{pick.reason}</Text>
       </View>
@@ -286,6 +340,22 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textTransform: "uppercase",
     letterSpacing: 0.5,
+  },
+  sectionHeader: {
+    paddingTop: 8,
+    paddingBottom: 10,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: "800",
+    color: palette.gold,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+  },
+  sectionSubtitle: {
+    fontSize: 11,
+    color: palette.textDim,
+    marginTop: 2,
   },
   row: {
     flexDirection: "row",
