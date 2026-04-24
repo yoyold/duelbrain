@@ -13,10 +13,11 @@
  * the human pick the final bucket. We do offer `deriveMatchResult()` for
  * callers that want a sanity check / auto-fill.
  */
-import { asc, desc, eq } from "drizzle-orm";
+import { asc, desc, eq, inArray } from "drizzle-orm";
 
 import { db, schema } from "./client";
 import type { LossReason } from "./loss_reason";
+import type { OpeningHandCard } from "./opening_hand_ops";
 
 export type MatchResult = "win" | "loss" | "draw";
 
@@ -27,6 +28,7 @@ export type GameRow = {
   result: MatchResult;
   lossReason: LossReason | null;
   notes: string | null;
+  openingHand: OpeningHandCard[];
 };
 
 export type MatchDetail = {
@@ -76,6 +78,47 @@ export async function loadMatch(matchId: number): Promise<MatchDetail> {
     .orderBy(asc(schema.games.gameNumber))
     .all();
 
+  // Opening hands in one shot for every game in the match. Grouped client-
+  // side. Saves a roundtrip per game; still cheap because the composite PK
+  // gives us an indexed lookup.
+  const handsByGame = new Map<number, OpeningHandCard[]>();
+  if (games.length > 0) {
+    const handRows = await db
+      .select({
+        gameId: schema.gameOpeningHand.gameId,
+        cardId: schema.cards.id,
+        name: schema.cards.name,
+        type: schema.cards.type,
+        copies: schema.gameOpeningHand.copies,
+        imageUrlSmall: schema.cards.imageUrlSmall,
+      })
+      .from(schema.gameOpeningHand)
+      .innerJoin(
+        schema.cards,
+        eq(schema.cards.id, schema.gameOpeningHand.cardId),
+      )
+      .where(
+        inArray(
+          schema.gameOpeningHand.gameId,
+          games.map((g) => g.id),
+        ),
+      )
+      .all();
+    for (const h of handRows) {
+      if (!handsByGame.has(h.gameId)) handsByGame.set(h.gameId, []);
+      handsByGame.get(h.gameId)!.push({
+        cardId: h.cardId,
+        name: h.name,
+        type: h.type,
+        copies: h.copies,
+        imageUrlSmall: h.imageUrlSmall,
+      });
+    }
+    for (const list of handsByGame.values()) {
+      list.sort((a, b) => a.name.localeCompare(b.name));
+    }
+  }
+
   return {
     id: row.id,
     deckName: row.deckName,
@@ -94,6 +137,7 @@ export async function loadMatch(matchId: number): Promise<MatchDetail> {
       result: g.result,
       lossReason: g.lossReason,
       notes: g.notes,
+      openingHand: handsByGame.get(g.id) ?? [],
     })),
   };
 }
